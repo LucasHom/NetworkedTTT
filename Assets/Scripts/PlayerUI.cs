@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 public class PlayerUI : MonoBehaviour
@@ -7,6 +8,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private GameObject circleArrowGameObject;
     [SerializeField] private GameObject crossYouTextGameObject;
     [SerializeField] private GameObject circleYouTextGameObject;
+    [SerializeField] private TextMeshProUGUI playerCrossScoreTextMesh;
+    [SerializeField] private TextMeshProUGUI playerCircleScoreTextMesh;
 
     private void Awake()
     {
@@ -14,6 +17,9 @@ public class PlayerUI : MonoBehaviour
         circleArrowGameObject.SetActive(false);
         crossYouTextGameObject.SetActive(false);
         circleYouTextGameObject.SetActive(false);
+
+        playerCrossScoreTextMesh.text = "0";
+        playerCircleScoreTextMesh.text = "0";
     }
 
     private void Start()
@@ -21,7 +27,16 @@ public class PlayerUI : MonoBehaviour
         //since both these events are invoked on the server we need them to run on server and client
         GameManager.Instance.OnGameStarted += GameManager_OnGameStarted;
         GameManager.Instance.OnCurrentPlayablePlayerTypeChanged += GameManager_OnCurrentPlayablePlayerTypeChanged;
+        GameManager.Instance.OnScoreChanged += GameManager_OnScoreChanged;
     }
+
+    private void GameManager_OnScoreChanged(object sender, EventArgs e)
+    {
+        GameManager.Instance.GetScores(out int crossScore, out int circleScore);
+        playerCrossScoreTextMesh.text = crossScore.ToString();
+        playerCircleScoreTextMesh.text = circleScore.ToString();
+    }
+
 
     private void GameManager_OnCurrentPlayablePlayerTypeChanged(object sender, EventArgs e)
     {
@@ -38,6 +53,9 @@ public class PlayerUI : MonoBehaviour
         {
             circleYouTextGameObject.SetActive(true);
         }
+
+        playerCrossScoreTextMesh.text = "0";
+        playerCircleScoreTextMesh.text = "0";
 
         UpdateCurrentArrow();
     }
