@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class GridPosition : MonoBehaviour
@@ -8,7 +9,10 @@ public class GridPosition : MonoBehaviour
 
     private void OnMouseDown()
     {
-        Debug.Log($"x: {x}, y: {y}");
+        if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
         GameManager.Instance.ClickedOnGridPositionRpc(x, y, GameManager.Instance.GetLocalPlayerType());
     }
 }

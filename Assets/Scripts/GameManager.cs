@@ -26,6 +26,8 @@ public class GameManager : NetworkBehaviour
     {
         public Line line;
         public PlayerType winPlayerType;
+        public string winnerTask;
+        public string loserTask;
     }
 
     public event EventHandler OnRematch;
@@ -65,6 +67,39 @@ public class GameManager : NetworkBehaviour
     private List<Line> lineList;
     private NetworkVariable<int> playerCrossScore = new NetworkVariable<int>();
     private NetworkVariable<int> playerCircleScore = new NetworkVariable<int>();
+
+    // Tasks for the losing player
+    public List<string> loserTasks = new List<string>()
+{
+    "Close your eyes",
+    "Do 5 pushups",
+    "If you blink, redo",
+    "Wait to be put in position, then don't move for the next minute",
+    "Wait to be spun, then walk in a straight line",
+    "Don't move",
+    "The winner will whisper you a secret word. Stay silent until you hear it again.",
+    "Spell SeanShawnShaun backwards under 30 seconds",
+    "Arm wrestle the winner but purposely lose (make it close)",
+    "This all means nothing. it's a distraction! But now... grab the nearest purple object. Slowest does 10 pushups.",
+    "Close your eyes"
+};
+
+    // Tasks for the winning player (corresponding to the loserTasks)
+    public List<string> winnerTasks = new List<string>()
+{
+    "Pour water on the loser's head",
+    "Sit on the loser’s back",
+    "Flick the loser’s forehead",
+    "Change the loser’s position; they must keep it for 1 minute",
+    "Spin the loser 15 times",
+    "Stack 3 items on the loser’s head",
+    "Whisper the loser a word",
+    "Start a 30 second timer; if they fail to spell SeanShawnShaun backwards, pour water on their head",
+    "Arm wrestle the loser",
+    "Grab the nearest purple object. Slowest does 10 pushups.",
+    "Use a snapchat filter on the opponent"
+};
+
 
     private void Awake()
     {
@@ -260,7 +295,10 @@ public class GameManager : NetworkBehaviour
                         playerCircleScore.Value++;
                         break;
                 }
-                TriggerOnGameWinRpc(i, winPlayerType);
+                int maxIndex = Mathf.Min(loserTasks.Count, winnerTasks.Count);
+                int randIndex = UnityEngine.Random.Range(0, maxIndex);
+
+                TriggerOnGameWinRpc(i, winPlayerType, winnerTasks[randIndex], loserTasks[randIndex]);
                 return;
             }
         }
@@ -292,13 +330,15 @@ public class GameManager : NetworkBehaviour
 
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void TriggerOnGameWinRpc(int lineIndex, PlayerType winPlayerType)
+    private void TriggerOnGameWinRpc(int lineIndex, PlayerType winPlayerType, string winnerTask, string loserTask)
     {
         Line line = lineList[lineIndex];
         OnGameWin?.Invoke(this, new OnGameWinEventArgs
         {
             line = line,
-            winPlayerType = winPlayerType
+            winPlayerType = winPlayerType,
+            winnerTask = winnerTask,
+            loserTask = loserTask
         });
     }
 

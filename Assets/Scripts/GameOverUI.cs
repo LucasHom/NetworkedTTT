@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -44,18 +45,25 @@ public class GameOverUI : MonoBehaviour
 
     private void GameManager_OnGameWin(object sender, GameManager.OnGameWinEventArgs e)
     {
-        if (e.winPlayerType == GameManager.Instance.GetLocalPlayerType())
+        bool localPlayerWon = e.winPlayerType == GameManager.Instance.GetLocalPlayerType();
+
+
+        if (localPlayerWon)
         {
-            resultTextGUI.text = "YOU WIN!";
+            resultTextGUI.text =
+                "YOU WIN!\n\n" + e.winnerTask;
             resultTextGUI.color = winColor;
         }
         else
         {
-            resultTextGUI.text = "YOU LOSE!";
+            resultTextGUI.text =
+                "YOU LOSE!\n\n" + e.loserTask;
             resultTextGUI.color = loseColor;
         }
+
         Show();
     }
+
 
     private void Show()
     {
@@ -66,4 +74,7 @@ public class GameOverUI : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
+
+
+
 }
