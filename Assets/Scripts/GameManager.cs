@@ -31,7 +31,7 @@ public class GameManager : NetworkBehaviour
     public event EventHandler OnRematch;
     public event EventHandler OnGameTied;
     public event EventHandler OnScoreChanged;
-
+    public event EventHandler OnPlacedObject;
 
 
     //Best to use this to track player instead of having different string trackers
@@ -198,6 +198,7 @@ public class GameManager : NetworkBehaviour
         }
 
         playerTypeArray[x, y] = playerType;
+        TriggerOnPlacedObjectRpc();
 
         //call funcs subbed to event
         OnClickedGridPosition?.Invoke(this, new OnClickedGridPositionEventArgs
@@ -219,6 +220,12 @@ public class GameManager : NetworkBehaviour
         }
 
         TestWinner();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void TriggerOnPlacedObjectRpc()
+    {
+        OnPlacedObject?.Invoke(this, EventArgs.Empty);
     }
 
     private bool TestWinnerLine(PlayerType a, PlayerType b, PlayerType c)
